@@ -149,15 +149,6 @@ def getBean(name: String): Bean = {
 
 # Running the Project
 
-## Clone the Repository
-
-```bash
-git clone https://github.com/your-username/spring-scopes-demo.git
-cd spring-scopes-demo
-```
-
----
-
 ## Run Tests
 
 ```bash
