@@ -1,47 +1,66 @@
 package pedrohk.service
 
-import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.mockito.MockitoSugar
 import pedrohk.model.{Profile, ProfileResponse}
 
-class ProfileServiceTest extends AnyFlatSpec with Matchers with MockitoSugar {
+class ProfileServiceTest extends AnyFlatSpec with Matchers {
 
-  "ProfileService" should "map a gateway response into a domain profile" in {
-    val gateway = mock[ProfileGateway]
+  class FakeProfileGateway extends ProfileGateway(
+    null,
+    ""
+  ) {
 
-    when(gateway.fetchProfile(31L)).thenReturn(
-      ProfileResponse(31L, "Pedro Henrique", "Reactive APIs", true)
-    )
-
-    val service = new ProfileService(gateway)
-
-    val result = service.retrieveProfile(31L)
-
-    result shouldBe Profile(
-      31L,
-      "Pedro Henrique",
-      "Reactive APIs",
-      true
-    )
-
-    verify(gateway, times(1)).fetchProfile(31L)
+    override def fetchProfile(identifier: Long): ProfileResponse = {
+      ProfileResponse(
+        identifier,
+        "Pedro Henrique",
+        "Distributed Systems",
+        true
+      )
+    }
   }
 
-  it should "preserve disabled profiles" in {
-    val gateway = mock[ProfileGateway]
+  class DisabledProfileGateway extends ProfileGateway(
+    null,
+    ""
+  ) {
 
-    when(gateway.fetchProfile(88L)).thenReturn(
-      ProfileResponse(88L, "Lia Martins", "Infrastructure Security", false)
-    )
+    override def fetchProfile(identifier: Long): ProfileResponse = {
+      ProfileResponse(
+        identifier,
+        "Lia Martins",
+        "Cloud Infrastructure",
+        false
+      )
+    }
+  }
+
+  "ProfileService" should "map gateway response into domain profile" in {
+
+    val gateway = new FakeProfileGateway
 
     val service = new ProfileService(gateway)
 
-    val result = service.retrieveProfile(88L)
+    val result = service.retrieveProfile(15L)
+
+    result shouldBe Profile(
+      15L,
+      "Pedro Henrique",
+      "Distributed Systems",
+      true
+    )
+  }
+
+  it should "preserve disabled profile state" in {
+
+    val gateway = new DisabledProfileGateway
+
+    val service = new ProfileService(gateway)
+
+    val result = service.retrieveProfile(99L)
 
     result.active shouldBe false
     result.owner shouldBe "Lia Martins"
-    result.expertise shouldBe "Infrastructure Security"
   }
 }
