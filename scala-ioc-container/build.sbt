@@ -1,11 +1,23 @@
 ThisBuild / version := "1.0.0"
 
-ThisBuild / scalaVersion := "3.8.3"
+name := "scala-ioc-container"
 
-lazy val root = (project in file("."))
-  .settings(
-    name := "scala-ioc-container",
-    libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.2.18" % Test
-    )
-  )
+scalaVersion := "3.8.3"
+
+libraryDependencies ++= Seq(
+  "org.scala-lang" %% "scala3-library" % "3.8.3",
+
+  "org.springframework" % "spring-context" % "6.2.8",
+  "org.springframework" % "spring-beans" % "6.2.8",
+  "org.springframework" % "spring-core" % "6.2.8",
+
+  "org.scalatest" %% "scalatest" % "3.2.20" % Test
+)
+
+Test / fork := true
+
+ThisBuild / scalacOptions ++= Seq(
+  "-deprecation",
+  "-feature",
+  "-unchecked"
+)
