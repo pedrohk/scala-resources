@@ -1,12 +1,23 @@
-ThisBuild / version := "1.0.0"
+name := "spring-core-bean-scopes"
 
-ThisBuild / scalaVersion := "3.8.3"
+version := "0.1.0"
 
-lazy val root = (project in file("."))
-  .settings(
-    name := "spring-core-bean-scopes",
-    libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.2.19" % Test
-    ),
-    testFrameworks += new TestFramework("org.scalatest.tools.Framework")
-  )
+scalaVersion := "3.8.3"
+
+libraryDependencies ++= Seq(
+  "org.scala-lang" %% "scala3-library" % "3.8.3",
+
+  "org.springframework" % "spring-context" % "6.2.8",
+  "org.springframework" % "spring-beans" % "6.2.8",
+  "org.springframework" % "spring-core" % "6.2.8",
+
+  "org.scalatest" %% "scalatest" % "3.2.20" % Test
+)
+
+Test / fork := true
+
+ThisBuild / scalacOptions ++= Seq(
+  "-deprecation",
+  "-feature",
+  "-unchecked"
+)
