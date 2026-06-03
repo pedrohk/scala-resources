@@ -1,158 +1,158 @@
-# Spring Scopes
+# Spring Core - Bean Scopes (Singleton, Prototype)
 
-A lightweight Scala project that demonstrates the concept of **Singleton** and **Prototype** bean scopes inspired by the behavior of the Spring Framework IoC container.
+A Scala 3.8.3 project built with Spring Framework that demonstrates how Spring's IoC container manages bean lifecycles using different scopes.
 
-This project implements a simple custom `BeanFactory` capable of:
+This project focuses on practical usage of:
 
-* Registering singleton beans
-* Registering prototype beans
-* Returning shared or fresh instances depending on scope
-* Managing bean providers dynamically
-* Throwing exceptions for missing beans
-* Validating behavior through automated tests using ScalaTest
+- Singleton scope
+- Prototype scope
+- Dependency Injection
+- Bean lifecycle management
+- Spring Java libraries with Scala
+- Automated testing with ScalaTest
 
----
-
-# Overview
-
-Dependency Injection frameworks such as Spring Framework commonly support different bean scopes.
-
-This project recreates two of the most important scopes in a minimal and educational way:
-
-| Scope     | Behavior                                          |
-| --------- | ------------------------------------------------- |
-| Singleton | The same object instance is returned every time   |
-| Prototype | A new object instance is created on every request |
-
-The implementation is intentionally simple to help developers understand the internal mechanics behind IoC containers and bean lifecycle management.
+The implementation intentionally keeps the domain small so the behavior of bean scopes remains easy to observe and validate.
 
 ---
 
 # Project Structure
 
 ```text
-spring-scopes-demo/
+spring-core-bean-scopes
 │
 ├── build.sbt
 │
-├── src/
-│   ├── main/
-│   │   └── scala/
-│   │       ├── Bean.scala
-│   │       └── BeanFactory.scala
+├── src
+│   ├── main
+│   │   └── scala
+│   │       └── pedrohk
+│   │           └── beanscope
+│   │               ├── Application.scala
+│   │               │
+│   │               ├── config
+│   │               │   └── BeanScopeConfiguration.scala
+│   │               │
+│   │               ├── model
+│   │               │   ├── DeveloperWorkspace.scala
+│   │               │   └── ScopeSnapshot.scala
+│   │               │
+│   │               └── service
+│   │                   ├── SingletonWorkspaceService.scala
+│   │                   └── PrototypeSessionService.scala
 │   │
-│   └── test/
-│       └── scala/
-│           └── BeanFactoryTest.scala
+│   └── test
+│       └── scala
+│           └── pedrohk
+│               └── beanscope
+│                   ├── ApplicationTest.scala
+│                   ├── config
+│                   ├── model
+│                   └── service
 ```
 
 ---
 
-# Technologies Used
+# Technologies
 
-* Scala 3.3.3
-* SBT
-* Java ConcurrentHashMap
-* ScalaTest
-
----
-
-# Features
-
-## Singleton Bean Registration
-
-Singleton beans are stored in an internal registry and reused across all calls.
-
-```scala
-factory.registerSingleton(
-  "mySingleton",
-  new SingletonBean("Shared instance")
-)
-```
-
-Every request returns the exact same object reference.
+| Technology | Version |
+|---|---|
+| Scala | 3.8.3 |
+| Spring Framework | 6.x |
+| Spring Context | Included |
+| ScalaTest | 3.2.20 |
+| SBT | Latest compatible |
 
 ---
 
-## Prototype Bean Registration
+# Concepts Demonstrated
 
-Prototype beans are registered as providers (factory functions).
+## Singleton Scope
 
-```scala
-factory.registerPrototype(
-  "myPrototype",
-  () => new PrototypeBean("New instance every time")
-)
+Beans created with singleton scope are instantiated once and reused throughout the application lifecycle.
+
+Example in this project:
+
+```text
+DeveloperWorkspace
+SingletonWorkspaceService
 ```
 
-Each call creates a completely new instance.
+Behavior:
+
+```text
+Request 1 → same instance
+Request 2 → same instance
+Request 3 → same instance
+```
 
 ---
 
-## Thread-Safe Internal Storage
+## Prototype Scope
 
-The project uses:
+Prototype beans generate a new object every time they are requested from the container.
 
-```scala
-java.util.concurrent.ConcurrentHashMap
+Example in this project:
+
+```text
+ScopeSnapshot
+PrototypeSessionService
 ```
 
-This ensures safe concurrent access to:
+Behavior:
 
-* Singleton registry
-* Prototype providers
+```text
+Request 1 → new instance
+Request 2 → new instance
+Request 3 → new instance
+```
 
 ---
 
-## UUID-Based Instance Tracking
+# Application Flow
 
-Each bean receives a unique UUID:
-
-```scala
-val instanceId: String =
-  java.util.UUID.randomUUID().toString
+```text
+Spring Context
+      │
+      ├── Singleton DeveloperWorkspace
+      │
+      └── Prototype ScopeSnapshot
+                │
+                ▼
+      PrototypeSessionService
 ```
 
-This makes it easy to verify whether instances are shared or recreated.
-
----
-
-# BeanFactory Design
-
-The `BeanFactory` acts as a tiny IoC container.
-
-Responsibilities include:
-
-* Managing bean registrations
-* Resolving dependencies by name
-* Handling singleton lifecycle
-* Handling prototype instantiation
-* Throwing exceptions for invalid lookups
-
-Core retrieval logic:
-
-```scala
-def getBean(name: String): Bean = {
-  if (singletonRegistry.containsKey(name)) {
-    singletonRegistry.get(name)
-  } else if (providers.containsKey(name)) {
-    providers.get(name)()
-  } else {
-    throw new NoSuchElementException(
-      s"No bean registered under name: $name"
-    )
-  }
-}
-```
+The application creates a reusable workspace bean while generating independent session snapshots for prototype requests.
 
 ---
 
 # Running the Project
 
-## Run Tests
+## Compile
+
+```bash
+sbt compile
+```
+
+## Run
+
+```bash
+sbt run
+```
+
+---
+
+# Running Tests
+
+Execute the complete test suite:
 
 ```bash
 sbt test
+```
+
+Execute a single test:
+
+```bash
+sbt "testOnly pedrohk.beanscope.config.BeanScopeConfigurationTest"
 ```
 
 ---
@@ -161,112 +161,62 @@ sbt test
 
 The test suite validates:
 
-* Singleton instance reuse
-* Prototype instance recreation
-* Exception handling for missing beans
+- Model construction
+- Service behavior
+- Singleton scope reuse
+- Prototype scope recreation
+- Bean injection
+- Spring container initialization
+- Application bootstrap
 
-Example assertion:
+Tests use:
 
-```scala
-firstCall should be theSameInstanceAs secondCall
+```text
+ScalaTest 3.2.20
 ```
 
-Prototype validation:
-
-```scala
-firstCall shouldNot be theSameInstanceAs secondCall
-```
+No mocking framework is required.
 
 ---
 
-# Example Output Concept
+# Example Scope Behavior
 
 Singleton:
 
 ```text
-Request 1 -> instanceId: abc123
-Request 2 -> instanceId: abc123
+workspaceA == workspaceB
+true
 ```
 
 Prototype:
 
 ```text
-Request 1 -> instanceId: abc123
-Request 2 -> instanceId: xyz789
+snapshotA == snapshotB
+false
 ```
 
 ---
 
-# Tradeoffs and Design Decisions
+# Design Notes
 
-## Advantages
+This project follows a lightweight architecture:
 
-### Simple and Educational
+```text
+Configuration
+    ↓
+Models
+    ↓
+Services
+    ↓
+Tests
+```
 
-The project focuses on core concepts without framework complexity.
-
-### Thread-Safe Registries
-
-Using `ConcurrentHashMap` improves concurrency safety.
-
-### Flexible Prototype Providers
-
-Prototype beans are lazily created using functions.
-
-### Lightweight
-
-No external DI container is required.
+The objective is to demonstrate Spring bean scope behavior clearly while keeping the implementation fully compatible with Scala 3.8.3.
 
 ---
 
-## Limitations
+# Build
 
-### No Dependency Injection
-
-Beans are manually instantiated and registered.
-
-### No Lifecycle Hooks
-
-Features such as:
-
-* initialization callbacks
-* destruction hooks
-* post processors
-
-are not implemented.
-
-### No Scope Hierarchy
-
-Only singleton and prototype scopes exist.
-
-### String-Based Lookup
-
-Bean resolution is name-based instead of type-safe.
-
----
-
-# Learning Goals
-
-This project is useful for understanding:
-
-* IoC container internals
-* Bean scopes
-* Object lifecycle management
-* Factory patterns
-* Lazy instantiation
-* Thread-safe registries
-* Functional providers in Scala
-
----
-
-# Possible Future Improvements
-
-* Constructor dependency injection
-* Type-safe bean lookup
-* Annotation-based registration
-* Bean post-processors
-* Custom scopes
-* Circular dependency detection
-* Reflection-based auto-wiring
-* Configuration files
-* Bean lifecycle callbacks
+```bash
+sbt clean compile test
+```
