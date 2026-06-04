@@ -1,283 +1,224 @@
 # Spring Injection (Scala 3)
 
-A lightweight Scala project that demonstrates the core concepts of **Dependency Injection** inspired by the Spring Framework ecosystem.
+A Scala 3.8.3 project built with Spring Framework that demonstrates Dependency Injection using both Constructor Injection and Setter Injection.
 
-This project focuses on two common injection strategies:
+This application shows how Spring's IoC container manages dependencies while keeping the code modular, testable, and easy to evolve.
 
-* Constructor Injection
-* Setter Injection
-
-It provides a simple and educational implementation using plain Scala classes without relying on a full IoC container.
+The project intentionally uses a lightweight architecture to focus on injection patterns instead of infrastructure complexity.
 
 ---
 
-# Overview
+# Features
 
-Dependency Injection (DI) is a design pattern that helps reduce coupling between components by externalizing dependency creation and management.
-
-This project demonstrates how different injection techniques work internally by implementing:
-
-* Service abstractions using traits
-* Multiple service implementations
-* Controllers that receive dependencies externally
-* Runtime dependency swapping
-* Validation through automated tests using ScalaTest
+* Constructor Injection
+* Setter Injection
+* Spring IoC Container
+* Manual Spring Configuration
+* Repository abstraction
+* In-memory data source
+* Scala 3 with Spring libraries
+* Automated tests using ScalaTest
 
 ---
 
 # Project Structure
 
-```text id="n2f7ks"
-spring-injection/
+```text
+spring-injection
 │
 ├── build.sbt
 │
-├── src/
-│   ├── main/
-│   │   └── scala/
-│   │       ├── MessageService.scala
-│   │       ├── ConstructorInjectedController.scala
-|   |       ├── EmailService.scala
-|   |       ├── SmsService.scala
-│   │       └── SetterInjectedController.scala
-│   │
-│   └── test/
-│       └── scala/
-│           └── InjectionTest.scala
+└── src
+    ├── main
+    │   └── scala
+    │       └── pedrohk
+    │           └── injection
+    │               ├── Application.scala
+    │               │
+    │               ├── config
+    │               │   └── InjectionConfiguration.scala
+    │               │
+    │               ├── model
+    │               │   └── DeveloperProfile.scala
+    │               │
+    │               ├── repository
+    │               │   ├── ProfileRepository.scala
+    │               │   └── InMemoryProfileRepository.scala
+    │               │
+    │               └── service
+    │                   ├── ConstructorInjectedProfileService.scala
+    │                   └── SetterInjectedProfileService.scala
+    │
+    └── test
+        └── scala
+            └── pedrohk
+                └── injection
 ```
 
 ---
 
-# Technologies Used
+# Technologies
 
-* Scala 3.8.3
-* SBT
-* ScalaTest
-
----
-
-# Implemented Concepts
-
-| Concept                     | Description                                                          |
-| --------------------------- | -------------------------------------------------------------------- |
-| Constructor Injection       | Dependencies are required during object creation                     |
-| Setter Injection            | Dependencies are assigned after object instantiation                 |
-| Abstraction via Traits      | Controllers depend on interfaces instead of concrete implementations |
-| Loose Coupling              | Services can be replaced without changing controller logic           |
-| Runtime Dependency Swapping | Dependencies can be changed dynamically                              |
+| Technology       | Version           |
+| ---------------- | ----------------- |
+| Scala            | 3.8.3             |
+| Spring Framework | 7.x               |
+| ScalaTest        | 3.2.20            |
+| SBT              | Latest compatible |
 
 ---
 
-# Message Services
-
-The project defines a common abstraction:
-
-```scala id="7e1vpm"
-trait MessageService {
-  def getMessage: String
-}
-```
-
-Two concrete implementations are provided:
-
-## Email Service
-
-```scala id="k2l8vd"
-class EmailService extends MessageService {
-  def getMessage: String = {
-    "Email Service Message"
-  }
-}
-```
-
-## SMS Service
-
-```scala id="bd5z0k"
-class SmsService extends MessageService {
-  def getMessage: String = {
-    "SMS Service Message"
-  }
-}
-```
-
----
-
-# Constructor Injection
-
-The dependency is required when creating the controller instance.
-
-```scala id="0f3xjv"
-val emailService = new EmailService()
-val controller =
-  new ConstructorInjectedController(emailService)
-```
-
-Implementation:
-
-```scala id="r8tw9o"
-class ConstructorInjectedController(
-  private val messageService: MessageService
-) {
-
-  def processMessage: String = {
-    messageService.getMessage
-  }
-
-}
-```
-
-## Advantages
-
-* Immutable dependencies
-* Safer initialization
-* Easier testing
-* Prevents partially constructed objects
-
----
-
-# Setter Injection
-
-Dependencies are assigned after object creation.
-
-```scala id="g0s1af"
-val controller = new SetterInjectedController()
-
-controller.setMessageService(new SmsService())
-```
-
-Implementation:
-
-```scala id="n9c2hm"
-def setMessageService(service: MessageService): Unit = {
-  this.messageService = service
-}
-```
-
-## Advantages
-
-* Flexible configuration
-* Runtime dependency replacement
-* Optional dependency support
-
-## Risks
-
-* Objects may become invalid before initialization
-* Requires runtime validation
-
-This project demonstrates that risk explicitly through:
-
-```scala id="4w8vut"
-throw new IllegalStateException(
-  "Dependency 'messageService' has not been initialized via setter injection."
-)
-```
-
----
-
-# Running the Project
-
-## Clone the Repository
-
-```bash id="3s7dqp"
-git clone https://github.com/your-username/spring-injection.git
-cd spring-injection
-```
-
----
-
-## Run Tests
-
-```bash id="w1q7nx"
-sbt test
-```
-
----
-
-# Test Coverage
-
-The automated test suite validates:
-
-* Successful constructor injection
-* Successful setter injection
-* Runtime validation for missing dependencies
-* Dynamic dependency replacement
-
-Example test:
-
-```scala id="1y4vzs"
-controller.processMessage shouldBe
-  "SMS Service Message"
-```
-
-Validation failure example:
-
-```scala id="x7nqle"
-assertThrows[IllegalStateException] {
-  controller.processMessage
-}
-```
-
----
-
-# Example Flow
+# Dependency Injection Approaches
 
 ## Constructor Injection
 
-```text id="3kv4nu"
-Controller Creation
-        ↓
-Dependency Provided
-        ↓
-Controller Ready To Use
+Dependencies are supplied during object creation.
+
+Advantages:
+
+* Immutable dependencies
+* Easier testing
+* Explicit object requirements
+* Preferred for mandatory dependencies
+
+Example flow:
+
+```text
+Repository
+    ↓
+ConstructorInjectedProfileService
 ```
 
 ---
 
 ## Setter Injection
 
-```text id="gw9fmr"
-Controller Creation
-        ↓
-Controller Exists Without Dependency
-        ↓
-Dependency Injected Later
-        ↓
-Controller Ready To Use
+Dependencies are assigned after object creation.
+
+Advantages:
+
+* Flexible configuration
+* Optional dependencies
+* Late initialization
+
+Example flow:
+
+```text
+Service
+   ↓
+setRepository(...)
 ```
 
 ---
 
-# Design Goals
+# Domain Model
 
-This project was built to help developers understand:
+The application works with developer profiles.
 
-* The fundamentals of Dependency Injection
-* The difference between constructor and setter injection
-* Loose coupling principles
-* Interface-based design
-* Runtime dependency management
-* Testable architecture patterns
+Each profile contains:
 
----
+```text
+id
+name
+mentor
+```
 
-# Tradeoffs Between Injection Styles
+Sample data:
 
-| Constructor Injection                 | Setter Injection                 |
-| ------------------------------------- | -------------------------------- |
-| Immutable dependencies                | Mutable dependencies             |
-| Safer initialization                  | More flexible                    |
-| Easier to reason about                | Allows runtime replacement       |
-| Recommended for required dependencies | Useful for optional dependencies |
+```text
+1 → Pedro Henrique → Lia
+2 → Caio Ventura → Lia
+```
 
 ---
 
-# Possible Future Improvements
+# Running the Application
 
-* Field injection examples
-* Simple IoC container
-* Annotation-based dependency registration
-* Automatic dependency resolution
-* Bean lifecycle management
-* Circular dependency detection
-* Configuration-driven injection
-* Reflection-based wiring
+Compile:
+
+```bash
+sbt compile
+```
+
+Run:
+
+```bash
+sbt run
+```
+
+---
+
+# Running Tests
+
+Execute all tests:
+
+```bash
+sbt test
+```
+
+Execute a specific suite:
+
+```bash
+sbt "testOnly pedrohk.injection.config.InjectionConfigurationTest"
+```
+
+---
+
+# Test Coverage
+
+The test suite validates:
+
+* Domain model behavior
+* Repository queries
+* Constructor Injection
+* Setter Injection
+* Bean creation
+* Spring context wiring
+* Application startup
+
+Tests avoid runtime bytecode instrumentation and do not require Mockito.
+
+---
+
+# Architecture
+
+```text
+Application
+    ↓
+Configuration
+    ↓
+Repository
+    ↓
+Services
+    ↓
+Model
+```
+
+---
+
+# Build
+
+```bash
+sbt clean compile test
+```
+
+Expected result:
+
+```text
+All tests passed
+```
+
+---
+
+# Learning Goals
+
+This project is designed to demonstrate:
+
+* How Spring resolves dependencies
+* Differences between constructor and setter injection
+* Dependency inversion
+* Testable service design in Scala
+* Spring Core fundamentals
+
+```
+```
