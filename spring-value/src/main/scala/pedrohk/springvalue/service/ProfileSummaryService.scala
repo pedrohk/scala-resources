@@ -11,12 +11,12 @@ class ProfileSummaryService(
   def createSummary(): ProfileSummary = {
 
     val profile =
-      profileValueService
-        .buildProfile()
+      profileValueService.buildProfile()
 
     new ProfileSummary(
       s"${profile.owner} works in ${profile.team} with ${profile.mentor} (${profile.environment})"
     )
+
   }
 
   def summaryText(): String = {

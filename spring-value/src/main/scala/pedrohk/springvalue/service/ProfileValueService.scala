@@ -6,7 +6,6 @@ import pedrohk.springvalue.model.DeveloperProfile
 
 @Service
 class ProfileValueService(
-
                            @Value("${developer.owner}")
                            private val owner: String,
 
@@ -21,7 +20,6 @@ class ProfileValueService(
                          ) {
 
   def buildProfile(): DeveloperProfile = {
-
     new DeveloperProfile(
       owner,
       team,
@@ -30,20 +28,12 @@ class ProfileValueService(
     )
   }
 
-  def ownerName(): String = {
-    owner
-  }
+  def ownerName(): String = owner
 
-  def teamName(): String = {
-    team
-  }
+  def teamName(): String = team
 
-  def mentorName(): String = {
-    mentor
-  }
+  def mentorName(): String = mentor
 
-  def environmentName(): String = {
-    environment
-  }
+  def environmentName(): String = environment
 
 }
