@@ -20,6 +20,9 @@ package P01 {
       assert(
         P05.penultimate(List(1, 1, 2, 3, 5, 8)) == 5
       )
+      assert(
+        P06.penultimate(List(1, 1, 2, 3, 5, 8)) == 5
+      )
     }
 
     test("find penultimate string") {
@@ -38,6 +41,9 @@ package P01 {
       assert(
           P05.penultimate(List("a", "b", "c")) == "b"
       )
+        assert(
+            P06.penultimate(List("a", "b", "c")) == "b"
+        )
     }
 
     test("two elements") {
@@ -56,6 +62,9 @@ package P01 {
       assert(
         P05.penultimate(List(10, 20)) == 10
       )
+        assert(
+          P06.penultimate(List(10, 20)) == 10
+        )
     }
 
     test("single element throws") {
@@ -74,6 +83,9 @@ package P01 {
       assertThrows[NoSuchElementException] {
         P05.penultimate(List(1))
       }
+        assertThrows[NoSuchElementException] {
+          P06.penultimate(List(1))
+        }
     }
 
     test("empty list throws") {
@@ -91,6 +103,9 @@ package P01 {
       }
       assertThrows[NoSuchElementException] {
         P05.penultimate(List.empty[Int])
+      }
+      assertThrows[NoSuchElementException] {
+        P06.penultimate(List.empty[Int])
       }
     }
   }
