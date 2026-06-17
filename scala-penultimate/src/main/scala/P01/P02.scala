@@ -4,21 +4,37 @@ package P01 {
 
     def penultimate[A](list: List[A]): A = {
 
-      def loop(current: List[A]): A = {
+      @annotation.tailrec
+      def loop(
+                current: List[A],
+                previous: Option[A]
+              ): A = {
+
         current match {
-          case first :: _ :: Nil => {
-            first
-          }
-          case _ :: tail => {
-            loop(tail)
-          }
-          case _ => {
+
+          case Nil => {
             throw new NoSuchElementException("List too short")
+          }
+
+          case head :: Nil => {
+            previous match {
+              case Some(value) => {
+                value
+              }
+
+              case None => {
+                throw new NoSuchElementException("List too short")
+              }
+            }
+          }
+
+          case head :: tail => {
+            loop(tail, Some(head))
           }
         }
       }
 
-      loop(list)
+      loop(list, None)
     }
   }
 }
