@@ -8,8 +8,8 @@ class P01Test extends AnyFunSuite with Matchers {
   private val solver = new P01()
 
   test("compresses the example from the problem statement") {
-    solver.compress(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)) shouldBe
-      List('a, 'b, 'c, 'a, 'd, 'e)
+    solver.compress(List(Symbol("a"), Symbol("a"), Symbol("a"), Symbol("a"), Symbol("b"), Symbol("c"), Symbol("c"), Symbol("a"), Symbol("a"), Symbol("d"), Symbol("e"), Symbol("e"), Symbol("e"), Symbol("e"))) shouldBe
+      List(Symbol("a"), Symbol("b"), Symbol("c"), Symbol("a"), Symbol("d"), Symbol("e"))
   }
 
   test("returns an empty list when given an empty list") {
@@ -17,15 +17,15 @@ class P01Test extends AnyFunSuite with Matchers {
   }
 
   test("returns the same single-element list unchanged") {
-    solver.compress(List('a)) shouldBe List('a)
+    solver.compress(List(Symbol("a"))) shouldBe List(Symbol("a"))
   }
 
   test("leaves a list with no consecutive duplicates unchanged") {
-    solver.compress(List('a, 'b, 'c, 'd)) shouldBe List('a, 'b, 'c, 'd)
+    solver.compress(List(Symbol("a"), Symbol("b"), Symbol("c"), Symbol("d"))) shouldBe List(Symbol("a"), Symbol("b"), Symbol("c"), Symbol("d"))
   }
 
   test("collapses a list made entirely of one repeated element") {
-    solver.compress(List('x, 'x, 'x, 'x, 'x)) shouldBe List('x)
+    solver.compress(List(Symbol("x"), Symbol("x"), Symbol("x"), Symbol("x"), Symbol("x"))) shouldBe List(Symbol("x"))
   }
 
   test("handles alternating runs of duplicates") {
